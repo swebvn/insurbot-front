@@ -6,9 +6,9 @@ window.Pusher = Pusher
 const echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_PUSHER_APP_KEY,
-    wsHost: window.location.hostname,
+    wsHost: import.meta.env.VITE_WSBHOST,
     cluster: '',
-    wsPort: 8080,
+    wsPort: 6001,
     forceTLS: false,
     disableStats: true,
 })

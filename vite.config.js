@@ -10,6 +10,15 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: 'insurbot.js',
+        format: 'iife',
+        name: 'Insurbot',
+      }
+    }
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

@@ -108,7 +108,7 @@ const conversationId = ref('')
 
 // Load messages from localStorage
 const loadMessages = () => {
-  const storedData = localStorage.getItem('chatData')
+  const storedData = sessionStorage.getItem('chatData')
   if (storedData) {
     const { messages: storedMessages, conversationId: storedId } = JSON.parse(storedData)
     messages.value = storedMessages
@@ -119,7 +119,7 @@ const loadMessages = () => {
 
 // Save messages to localStorage
 const saveMessages = () => {
-  localStorage.setItem('chatData', JSON.stringify({
+  sessionStorage.setItem('chatData', JSON.stringify({
     messages: messages.value,
     conversationId: conversationId.value
   }))
@@ -181,7 +181,7 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    await axios.post('http://127.0.0.1:8000/api/chatbot', {
+    await axios.post(import.meta.env.VITE_API_URL + '/chatbot', {
       prompt: userMsg,
       conversation_id: conversationId.value
     })
@@ -199,6 +199,7 @@ const sendMessage = async () => {
 
 echo.channel('chatroom').listen('MessageSent', (e) => {
   loading.value = false
+  console.log(e.message)
   messages.value.push({
     sender: 'bot',
     text: e.message
