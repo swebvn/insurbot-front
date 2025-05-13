@@ -5,17 +5,11 @@ import { bgImageBase64 } from '@/assets/images';
 import ChatApp from "@/components/ChatApp.vue";
 
 const showModal = ref(false)
+
 const toggleModal = () => {
   showModal.value = !showModal.value
 }
 
-const handleClose = () => {
-  showModal.value = false;
-};
-
-// onMounted(() => {
-//     showModal.value = true
-// });
 </script>
 
 <template>
@@ -30,7 +24,7 @@ const handleClose = () => {
   >
     Unlock 10% off
   </button>
-  <ChatApp v-show="showModal" @close="handleClose"/>
+  <ChatApp v-model="showModal"/>
 </template>
 
 <style scoped>

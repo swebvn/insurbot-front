@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-2xl mx-auto mt-10">
+  <div class="max-w-2xl mx-auto mt-10" v-if="isShow">
     <!-- Header -->
     <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-xl px-6 py-4 flex justify-between items-center shadow-lg">
       <div class="text-white text-xl font-extrabold tracking-wide">INSURBOT</div>
@@ -117,10 +117,6 @@ const loadMessages = () => {
   }
 }
 
-const closePopup = () => {
-  emit('close');
-};
-
 // Save messages to localStorage
 const saveMessages = () => {
   localStorage.setItem('chatData', JSON.stringify({
@@ -146,11 +142,6 @@ const scrollToBottom = () => {
   })
 }
 
-// Watch messages to scroll to bottom when they change
-watchEffect(messages, () => {
-  console.log(messages)
-  scrollToBottom()
-}, { deep: true })
 
 const renderMarkdown = (text) => {
   return marked.parse(text || '')
@@ -173,12 +164,7 @@ watch(chatStarted, (started) => {
 
 onMounted(async () => {
   loadMessages()
-  await nextTick()
   scrollToBottom()
-
-  setTimeout(() => {
-    scrollToBottom()
-  }, 200)
 })
 
 const sendMessage = async () => {
@@ -220,4 +206,18 @@ echo.channel('chatroom').listen('MessageSent', (e) => {
   saveMessages()
   scrollToBottom()
 })
+
+
+const isShow = defineModel()
+
+// watch xem khi nao popup bat thi scroll xuong . mounted ở đây gen trước khi cái popup chạy nên nó k nhận hàm scroll to bottom
+watchEffect(() => {
+  if (isShow.value) {
+    scrollToBottom()
+  }
+})
+
+const closePopup = () => {
+  isShow.value = false
+}
 </script>
