@@ -1,82 +1,98 @@
 <template>
-  <div class="max-w-2xl mx-auto mt-10" v-if="isShow">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-xl px-6 py-4 flex justify-between items-center shadow-lg">
-      <div class="text-white text-xl font-extrabold tracking-wide">INSURBOT</div>
-      <button @click.prevent="closePopup" class="text-white hover:text-gray-200 hover:scale-110 transition-all duration-200 text-3xl font-bold">
-        –
-      </button>
-    </div>
-
-    <!-- Chat Container -->
-    <div class="max-w-2xl h-[550px] bg-gray-800 rounded-b-xl flex flex-col p-4">
-      <!-- Start Chat Screen -->
-      <div v-if="!chatStarted" class="flex-1 flex items-center justify-center">
-        <button
-            @click="startChat"
-            class="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
-        >
-          Start Chat
-        </button>
+  <div class="relative">
+    <div class="max-w-lg mt-10 md:fixed md:right-5 right-1 mx-2 bottom-[100px]">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-secondary/50 to-primary/100 rounded-t-xl px-3 py-2 flex justify-between items-center shadow-lg">
+        <div class="text-white text-xl font-extrabold tracking-wide flex justify-center items-center">
+          <img :src="insurbotLogo" alt="logo" class="w-[30px] mr-2"/>
+          INSURBOT
+        </div>
+        <div class="flex gap-2">
+          <button @click.prevent="reloadChat" class="text-white hover:text-gray-200 hover:scale-110 transition-all duration-200 text-2xl font-bold">
+            ↻
+          </button>
+          <button @click.prevent="closePopup" class="text-white hover:text-gray-200 hover:scale-110 transition-all duration-200 text-3xl font-bold">
+            –
+          </button>
+        </div>
       </div>
 
-      <!-- Chat Interface -->
-      <div v-else class="flex flex-col h-full">
-        <!-- Chat box -->
-        <div ref="chatBox" class="flex-1 overflow-y-auto space-y-2 pr-2">
-          <div
-              v-for="(msg, idx) in messages"
-              :key="idx"
-              :class="[
+      <!-- Chat Container -->
+      <div class="max-w-2xl w-full h-[550px] bg-white rounded-b-xl flex flex-col px-4 pb-2 md:min-w-[450px] border border-gray-200">
+        <!-- Start Chat Screen -->
+        <div v-if="!chatStarted" class="flex-1 flex items-center justify-center">
+          <button
+              @click="startChat"
+              class="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors"
+          >
+            Bắt đầu đoạn chat
+          </button>
+        </div>
+
+        <!-- Chat Interface -->
+        <div v-else class="flex flex-col h-full">
+          <!-- Chat box -->
+          <div ref="chatBox" class="flex-1 overflow-y-auto space-y-2 pr-2 chat-scrollbar">
+            <div
+                v-for="(msg, idx) in messages"
+                :key="idx"
+                :class="[
               'flex',
               msg.sender === 'user' ? 'justify-end' : 'justify-start'
             ]"
-          >
-            <div
-                :class="[
-                'px-4 py-2 rounded-xl break-words mt-3',
-                msg.sender === 'user'
-                  ? 'bg-blue-500 text-white max-w-xs'
-                  : 'bg-gray-200 text-gray-800 max-w-md'
-              ]"
             >
-              <div>
-                <!-- Sender name -->
-                <div
-                    class="text-sm font-bold mb-1"
-                    :class="msg.sender === 'user' ? 'text-white text-right' : 'text-purple-600 text-left'"
-                >
-                  {{ msg.sender === 'user' ? '🧑 You' : '🤖 Insurbot' }}
-                </div>
+              <div
+                  :class="[
+                'px-4 py-3 rounded-xl break-words mt-3',
+                msg.sender === 'user'
+                  ? 'bg-blue-500 text-white max-w-xs ml-5'
+                  : 'bg-gradient-to-r from-secondary/10 to-primary/10 text-gray-700 max-w-xs mr-5'
+              ]"
+              >
+                <div>
+                  <!-- Sender name -->
+                  <div
+                      v-if="msg.sender === 'bot'"
+                      class="text-primary text-left text-sm font-bold mb-1 flex items-center"
+                  >
+                    <img :src="insurbotLogo" alt="logo" class="w-[20px] inline mr-1" v-if="msg.sender === 'bot'"/>  Insurbot
+                  </div>
 
-                <!-- Message content -->
-                <div
-                    v-html="renderMarkdown(msg.text)"
-                    class="prose prose-sm max-w-none leading-snug space-y-2"
-                    :class="msg.sender === 'user' ? 'text-white' : 'text-gray-700'"
-                ></div>
+                  <!-- Message content -->
+                  <div
+                      v-html="renderMarkdown(msg.text)"
+                      class="prose prose-sm max-w-none leading-snug space-y-2"
+                      :class="msg.sender === 'user' ? 'text-white' : 'text-gray-700'"
+                  ></div>
+                </div>
               </div>
             </div>
+
+            <!-- Loading indicator -->
+            <div v-if="loading" class="text-gray-500 italic text-sm pl-2"><img :src="insurbotLogo" alt="logo" class="w-[20px] mr-2"/> Insurbot đang nhập...</div>
           </div>
 
-          <!-- Loading indicator -->
-          <div v-if="loading" class="text-gray-300 italic text-sm pl-2">🤖 Insurbot is typing...</div>
-        </div>
-
-        <!-- Input -->
-        <div class="pt-4 relative flex items-center gap-2">
-          <input
-              v-model="message"
-              @keyup.enter="sendMessage"
-              placeholder="Nhập tin nhắn..."
-              class="flex-1 px-4 py-2 rounded-xl border border-gray-500 focus:outline-none focus:ring focus:border-blue-300 bg-gray-700 text-white placeholder-gray-400"
-          />
-          <button
-              @click="sendMessage"
-              class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
-          >
-            Gửi
-          </button>
+          <!-- Input -->
+          <div class="pt-4 relative flex items-center gap-2">
+            <textarea
+                rows="1"
+                maxlength="200"
+                v-model="message"
+                @keyup.enter="sendMessage"
+                placeholder="Nhập tin nhắn..."
+                class="resize-none flex-1 px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-primary/50 focus:ring focus:border-primary bg-white text-gray-800 placeholder-gray-500"
+            />
+            <button
+                @click="sendMessage"
+                class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center"
+                title="Send"
+            >
+              <div class="flex items-center justify-center">
+                <img :src="IconSend" class="w-[30px] h-[25px]" alt="send"/>
+              </div>
+            </button>
+          </div>
+          <span class="text-[10px] mt-2 text-center text-gray-500">Thông tin chỉ mang tính tham khảo, được tư vấn bởi Trí Tuệ Nhân Tạo</span>
         </div>
       </div>
     </div>
@@ -84,10 +100,12 @@
 </template>
 
 <script setup>
-import {ref, onMounted, nextTick, watch, watchEffect} from 'vue'
+import { ref, onMounted, nextTick, watch, watchEffect } from 'vue'
 import axios from 'axios'
 import echo from '../echo.js'
 import { marked } from 'marked'
+import insurbotLogo from '@/assets/imgs/insurbot-logo.png';
+import IconSend from "@/assets/imgs/send-icon.svg";
 
 // Generate UUID for conversation_id
 const generateUUID = () => {
@@ -108,7 +126,7 @@ const conversationId = ref('')
 
 // Load messages from localStorage
 const loadMessages = () => {
-  const storedData = sessionStorage.getItem('chatData')
+  const storedData = localStorage.getItem('chatData')
   if (storedData) {
     const { messages: storedMessages, conversationId: storedId } = JSON.parse(storedData)
     messages.value = storedMessages
@@ -117,9 +135,20 @@ const loadMessages = () => {
   }
 }
 
+const closePopup = () => {
+  emit('close');
+};
+
+// Reload chat: clear messages and start new conversation
+const reloadChat = () => {
+  messages.value = []
+  conversationId.value = generateUUID()
+  localStorage.removeItem('chatData')
+}
+
 // Save messages to localStorage
 const saveMessages = () => {
-  sessionStorage.setItem('chatData', JSON.stringify({
+  localStorage.setItem('chatData', JSON.stringify({
     messages: messages.value,
     conversationId: conversationId.value
   }))
@@ -130,18 +159,19 @@ const scrollToBottom = () => {
     if (chatBox.value) {
       const scrollHeight = chatBox.value.scrollHeight
       chatBox.value.scrollTop = scrollHeight
-      console.log('Scrolled to bottom, scrollHeight:', scrollHeight, 'scrollTop:', chatBox.value.scrollTop)
       // Retry scroll in case of rendering delay
       requestAnimationFrame(() => {
         if (chatBox.value && chatBox.value.scrollTop !== chatBox.value.scrollHeight) {
           chatBox.value.scrollTop = chatBox.value.scrollHeight
-          console.log('Retry scroll, scrollHeight:', chatBox.value.scrollHeight, 'scrollTop:', chatBox.value.scrollTop)
         }
       })
     }
   })
 }
 
+watchEffect(() => {
+  scrollToBottom()
+}, { deep: true })
 
 const renderMarkdown = (text) => {
   return marked.parse(text || '')
@@ -164,7 +194,12 @@ watch(chatStarted, (started) => {
 
 onMounted(async () => {
   loadMessages()
+  await nextTick()
   scrollToBottom()
+
+  setTimeout(() => {
+    scrollToBottom()
+  }, 200)
 })
 
 const sendMessage = async () => {
@@ -181,7 +216,7 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    await axios.post(import.meta.env.VITE_API_URL + '/chatbot', {
+    await axios.post('http://127.0.0.1:8000/api/chatbot', {
       prompt: userMsg,
       conversation_id: conversationId.value
     })
@@ -199,7 +234,6 @@ const sendMessage = async () => {
 
 echo.channel('chatroom').listen('MessageSent', (e) => {
   loading.value = false
-  console.log(e.message)
   messages.value.push({
     sender: 'bot',
     text: e.message
@@ -207,18 +241,4 @@ echo.channel('chatroom').listen('MessageSent', (e) => {
   saveMessages()
   scrollToBottom()
 })
-
-
-const isShow = defineModel()
-
-// watch xem khi nao popup bat thi scroll xuong . mounted ở đây gen trước khi cái popup chạy nên nó k nhận hàm scroll to bottom
-watchEffect(() => {
-  if (isShow.value) {
-    scrollToBottom()
-  }
-})
-
-const closePopup = () => {
-  isShow.value = false
-}
 </script>

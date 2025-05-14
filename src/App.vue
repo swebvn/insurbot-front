@@ -1,30 +1,43 @@
 <script setup>
-import {onMounted, ref} from 'vue';
-
-import { bgImageBase64 } from '@/assets/images';
+import { ref } from 'vue';
 import ChatApp from "@/components/ChatApp.vue";
+import insurbotLogo from '@/assets/imgs/logo.png';
 
-const showModal = ref(false)
+const showModal = ref(false);
 
 const toggleModal = () => {
-  showModal.value = !showModal.value
-}
+  showModal.value = !showModal.value;
+};
 
+const handleClose = () => {
+  showModal.value = false;
+};
 </script>
 
 <template>
-  <button id="button-email-small" @click="toggleModal"
-          :style="{
-          backgroundImage: `url(${bgImageBase64})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundColor: '#1a1a1a'
-        }"
+  <button
+      id="button-email-small"
+      @click="toggleModal"
+      :class="[
+      'fixed bottom-14 right-2 z-50',
+      'p-2 font-bold cursor-pointer',
+      'w-[100px] h-[100px] rounded-full',
+      'transition-all duration-500 ease-in-out',
+      showModal ? 'translate-y-20 opacity-0' : 'translate-y-0 opacity-100'
+    ]"
   >
-    Unlock 10% off
+    <img :src="insurbotLogo" alt="logo" class="w-full"/>
   </button>
-  <ChatApp v-model="showModal"/>
+
+  <div
+      :class="[
+      'fixed bottom-0 right-0 w-full  h-screen z-50',
+      'transition-all duration-500 ease-in-out overflow-hidden',
+      showModal ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+    ]"
+  >
+    <ChatApp v-if="showModal" @close="handleClose" />
+  </div>
 </template>
 
 <style scoped>
@@ -37,22 +50,8 @@ const toggleModal = () => {
   margin-top: 60px;
 }
 
-button#button-email-small {
-  position: fixed;
-  bottom: 3.5rem;
-  right: 0.5rem;
-  background-color: black;
-  color: white;
-  padding: 0.5rem;
+#button-email-small {
   font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  border: 0;
-  outline: 0;
-  z-index: 10000;
   line-height: 1rem;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
 }
 </style>

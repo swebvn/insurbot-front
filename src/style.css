@@ -2,13 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-::-webkit-scrollbar {
-    width: 6px;
+.chat-scrollbar {
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
 }
-::-webkit-scrollbar-thumb {
+
+/* Ẩn scrollbar mặc định */
+.chat-scrollbar::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+}
+
+/* Khi hover thì hiện scrollbar đẹp */
+.chat-scrollbar:hover::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.chat-scrollbar:hover::-webkit-scrollbar-thumb {
     background-color: rgba(156, 163, 175, 0.5); /* gray-400 */
     border-radius: 9999px;
 }
-::-webkit-scrollbar-track {
+
+.chat-scrollbar:hover::-webkit-scrollbar-track {
     background-color: rgba(55, 65, 81, 0.2); /* gray-700 */
 }
