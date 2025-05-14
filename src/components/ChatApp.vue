@@ -46,7 +46,7 @@
                 'px-4 py-3 rounded-xl break-words mt-3',
                 msg.sender === 'user'
                   ? 'bg-blue-500 text-white max-w-xs ml-5'
-                  : 'bg-gradient-to-r from-secondary/10 to-primary/10 text-gray-700 max-w-xs mr-5'
+                  : 'bg-gradient-to-r from-secondary/10 to-primary/10 text-gray-700 max-w-sm mr-5'
               ]"
               >
                 <div>
@@ -144,6 +144,7 @@ const reloadChat = () => {
   messages.value = []
   conversationId.value = generateUUID()
   localStorage.removeItem('chatData')
+  chatStarted.value = false
 }
 
 // Save messages to localStorage
@@ -180,8 +181,12 @@ const renderMarkdown = (text) => {
 const startChat = () => {
   conversationId.value = generateUUID()
   chatStarted.value = true
-  messages.value = []
+  messages.value = [{
+    sender: 'bot',
+    text: 'Xin chào anh chị, **INSURBOT** sẵn sàng hỗ trợ! Anh chị cần tư vấn gì hôm nay?'
+  }]
   saveMessages()
+  scrollToBottom()
 }
 
 watch(chatStarted, (started) => {
